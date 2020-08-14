@@ -1,0 +1,4 @@
+include ':AppboosterSdk'
+include ':ExampleAppKotlin'
+include ':ExampleAppJava'
+rootProject.name = "Appbooster SDK with Example Apps"

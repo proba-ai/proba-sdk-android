@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="16dp">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <TextView
+        android:id="@+id/appboosterExperimentTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="48dp"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large" />
+
+    <TextView
+        android:id="@+id/appboosterExperimentKey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="48dp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="4dp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioGroup
+            android:id="@+id/appboosterExperimentOptionsRadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@drawable/appbooster_option_divider"
+            android:showDividers="middle" />
+
+        <LinearLayout
+            android:id="@+id/appboosterExperimentOptionsTextLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@drawable/appbooster_option_divider"
+            android:orientation="vertical"
+            android:showDividers="middle" />
+    </FrameLayout>
+</LinearLayout>
