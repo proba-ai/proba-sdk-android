@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -25,6 +26,27 @@ class AppboosterDebugActivity : AppCompatActivity() {
         setContentView(R.layout.appbooster_layout_activity_debug)
 
         val container = findViewById<ViewGroup>(R.id.appboosterExperimentsContainer)
+
+        findViewById<ImageButton>(R.id.appboosterSaveButton).setOnClickListener {
+            store.experimentsDebugDefaults = mExperimentsDebugDefaults
+                .map { (k,v) ->
+                    Log.d("Appbooster", "Map $k, $v on debug ExperimentDefault")
+                    ExperimentDefault(k, v)
+                }
+            finish()
+        }
+        findViewById<Button>(R.id.appboosterResetButton).setOnClickListener {
+            store.experimentsDebugDefaults = emptyList()
+            container.removeAllViews()
+            store.experiments
+                .map {
+                    mapExperimentOnViews(it)
+                }
+                .forEach {
+                    container.addView(it)
+                }
+        }
+
         store.experiments
             .map {
                 mapExperimentOnViews(it)
@@ -32,13 +54,6 @@ class AppboosterDebugActivity : AppCompatActivity() {
             .forEach {
                 container.addView(it)
             }
-        findViewById<ImageButton>(R.id.appboosterSaveButton).setOnClickListener {
-            store.experimentsDebugDefaults = mExperimentsDebugDefaults
-                .map { (k,v) ->
-                    Log.d("Appbooster", "Map $k, $v on debug ExperimentDefault")
-                    ExperimentDefault(k, v)
-                }
-        }
     }
 
     private fun mapExperimentOnViews(experiment: CompositeExperiment): View {
@@ -51,18 +66,19 @@ class AppboosterDebugActivity : AppCompatActivity() {
         experimentContainer.findViewById<TextView>(R.id.appboosterExperimentKey).apply {
             text = experiment.key
         }
-        val defaultOption = store.experimentsDebugDefaults.firstOrNull { it.key == experiment.key }?.value?: store.experimentsDefaults.firstOrNull { it.key == experiment.key }?.value ?: ""
+        val receivedOption = store.experimentsDefaults.firstOrNull { it.key == experiment.key }?.value ?: ""
+        val defaultOption = store.experimentsDebugDefaults.firstOrNull { it.key == experiment.key }?.value?: receivedOption
         experimentContainer.findViewById<ViewGroup>(R.id.appboosterExperimentOptionsTextLayout).apply {
             experiment.options
                 .map {
-                    mapExperimentOptionOnViews(it, defaultOption, this)
+                    mapExperimentOptionOnViews(it, receivedOption, this)
                 }
                 .forEach { addView(it) }
         }
         experimentContainer.findViewById<RadioGroup>(R.id.appboosterExperimentOptionsRadioGroup).apply {
             val defaultOption = experiment.options
                 .map {
-                    mapExperimentOptionOnRadios(experiment, it, defaultOption, this)
+                    mapExperimentOptionOnRadios(experiment, it, receivedOption, defaultOption, this)
                 }
                 .map {
                     addView(it)
@@ -82,9 +98,9 @@ class AppboosterDebugActivity : AppCompatActivity() {
         return experimentContainer
     }
 
-    private fun mapExperimentOptionOnViews(option: ExperimentOption, defaultValue: String, container: ViewGroup): View {
+    private fun mapExperimentOptionOnViews(option: ExperimentOption, receivedOption: String, container: ViewGroup): View {
 
-        if (option.value == defaultValue) {
+        if (option.value == receivedOption) {
             return inflater.inflate(R.layout.appbooster_experiment_option_item_received, container, false)
                 .apply {
                     findViewById<TextView>(R.id.appboosterOptionDescription).text = option.description
@@ -101,11 +117,12 @@ class AppboosterDebugActivity : AppCompatActivity() {
     private fun mapExperimentOptionOnRadios(
         experiment: CompositeExperiment,
         option: ExperimentOption,
-        defaultValue: String,
+        receivedOption: String,
+        defaultOption: String,
         container: ViewGroup
     ): View {
-        val tag = ExperimentOptionTag(experiment.key, option.value, option.value == defaultValue)
-        if (option.value == defaultValue) {
+        val tag = ExperimentOptionTag(experiment.key, option.value, option.value == defaultOption)
+        if (option.value == receivedOption) {
             return inflater.inflate(R.layout.appbooster_experiment_option_radio_received, container, false).apply {
                 this.tag = tag
             }

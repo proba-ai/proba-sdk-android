@@ -34,6 +34,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:layout_gravity="top|right"
+                    android:id="@+id/appboosterResetButton"
                     android:text="RESET"
                     android:textColor="#1894e7" />
             </FrameLayout>
