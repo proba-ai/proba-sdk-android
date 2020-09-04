@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 29
@@ -25,6 +25,23 @@ android {
     }
 }
 
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                // Applies the component for the release build variant.
+                from components.release
+
+                // You can then customize attributes of the publication as shown below.
+                groupId = 'com.appbooster.appboostersdk'
+                artifactId = 'appboostersdk'
+                version = '0.0.1'
+            }
+        }
+    }
+}
+
 dependencies {
     api fileTree(dir: "libs", include: ["*.jar"])
     api "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -35,8 +52,8 @@ dependencies {
     api 'com.squareup.moshi:moshi:1.9.3'
     api 'io.jsonwebtoken:jjwt-api:0.11.2'
     kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.9.3'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'
-    runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.11.2') {
+    api 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    api('io.jsonwebtoken:jjwt-orgjson:0.11.2') {
         exclude group: 'org.json', module: 'json' //provided by Android natively
     }
 }
