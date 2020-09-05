@@ -31,30 +31,53 @@ import java.util.*
  * THE SOFTWARE.
  */
 
+/**
+ * Example Javadoc For AppboosterSdk
+ *
+ * */
 public class AppboosterSdk private constructor(
     private val sdkToken: String,
     private val appId: String,
     private var deviceId: String,
     private var usingShake: Boolean,
-    private val defaults: Map<String, Any>,
+    private val defaults: Map<String, String>,
     private val store: Store,
     sensorManager: SensorManager,
     private val applicationContext: Context
-) : ShakeDetector.Listener {
+) {
 
     private var mLastShakeTime: Long = -1L
 
     init {
         if (usingShake) {
-            val shakeDetector = ShakeDetector(this)
+            val shakeDetector = ShakeDetector(object : ShakeDetector.Listener {
+                override fun hearShake() {
+                    Log.d("AppboosterSdk", "Shake heard")
+                    if (!store.isInDebugMode) {
+                        return
+                    }
+                    val shakeTime = SystemClock.elapsedRealtime()
+                    if (mLastShakeTime != -1L && (shakeTime - mLastShakeTime) < 5_000) {
+                        return
+                    }
+                    mLastShakeTime = shakeTime
+                    Log.d("AppboosterSdk", "Shake passed")
+                    AppboosterDebugActivity.launch(applicationContext)
+                }
+
+            })
             shakeDetector.start(sensorManager)
         }
     }
 
     private val client: Client = Client(store, appId, deviceId, sdkToken)
 
+    /**
+     * Example javadoc for fetch
+     * @param timeoutMillis: connection timeout
+     * */
     fun fetch(timeoutMillis: Long = 30000L, onSuccessListener: OnSuccessListener, onErrorListener: OnErrorListener) {
-        client.fetchExperimentsShort(timeoutMillis, defaults.keys, onSuccessListener, onErrorListener)
+        client.fetchExperimentsShort(timeoutMillis, defaults, onSuccessListener, onErrorListener)
     }
 
     operator fun get(key: String): String? = value(key)
@@ -64,26 +87,12 @@ public class AppboosterSdk private constructor(
         store.experimentsDefaults.firstOrNull { it.key == key }?.value
     }
 
-    override fun hearShake() {
-        Log.d("AppboosterSdk", "Shake heard")
-        if (!store.isInDebugMode) {
-            return
-        }
-        val shakeTime = SystemClock.elapsedRealtime()
-        if (mLastShakeTime != -1L && (shakeTime - mLastShakeTime) < 5_000) {
-            return
-        }
-        mLastShakeTime = shakeTime
-        Log.d("AppboosterSdk", "Shake passed")
-        AppboosterDebugActivity.launch(applicationContext)
-    }
-
     class Builder(private val context: Context) {
         private var sdkToken: String? = null
         private var appId: String? = null
         private var deviceId: String? = null
         private var usingShake: Boolean = true
-        private var defaults: Map<String, Any> = emptyMap()
+        private var defaults: Map<String, String> = emptyMap()
 
         private val store = Store.getInstance(context.applicationContext)
         private val sensorManager = context.applicationContext.getSystemService(SENSOR_SERVICE) as SensorManager
@@ -92,7 +101,7 @@ public class AppboosterSdk private constructor(
         fun appId(appId: String) = apply { this.appId = appId }
         fun deviceId(deviceId: String) = apply { this.deviceId = deviceId }
         fun usingShake(usingShake: Boolean = true) = apply { this.usingShake = usingShake }
-        fun defaults(defaults: Map<String, Any>) = apply { this.defaults = defaults }
+        fun defaults(defaults: Map<String, String>) = apply { this.defaults = defaults }
         fun build(): AppboosterSdk {
             if (sdkToken.isNullOrEmpty()) {
                 throw AppboosterSetupException("SDK Token must not be null")

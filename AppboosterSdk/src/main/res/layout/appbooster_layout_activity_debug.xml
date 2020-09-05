@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -26,8 +27,9 @@
                     android:layout_gravity="top|left"
                     android:gravity="center_vertical"
                     android:paddingLeft="16dp"
+                    android:textColor="@android:color/black"
                     android:text="A/B-tests"
-                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large" />
+                    android:textAppearance="?textAppearanceHeadline4" />
 
                 <Button
                     style="?borderlessButtonStyle"
@@ -48,6 +50,7 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
+                android:textAppearance="?textAppearanceBody2"
                 android:text="In debug mode, you can:\n1. See all available experiments for this app build\n2. View all options as users see them" />
 
             <Space
@@ -62,6 +65,10 @@
                 android:text="AVAILABLE EXPERIMENTS"
                 android:textStyle="bold" />
 
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="16dp" />
+
             <LinearLayout
                 android:id="@+id/appboosterExperimentsContainer"
                 android:layout_width="match_parent"
@@ -74,10 +81,9 @@
 
     </ScrollView>
 
-    <ImageButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/appboosterSaveButton"
-        android:src="@drawable/ic_check"
-        android:background="@drawable/appbooster_check_bg"
+        app:srcCompat="@drawable/ic_check"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"

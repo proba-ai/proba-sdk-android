@@ -50,17 +50,20 @@ internal class Client(
 
     internal fun fetchExperimentsShort(
         timeoutMillis: Long,
-        defaultKeys: Set<String>,
+        defaults: Map<String, String>,
         onSuccessListener: AppboosterSdk.OnSuccessListener,
         onErrorListener: AppboosterSdk.OnErrorListener
     ) {
         val okHttpClient = okHttpClientBuilder.connectTimeout(timeoutMillis, TimeUnit.MILLISECONDS).build()
-        val request = requestBuilder.request(makeQueryString(defaultKeys), Api.EXPERIMENTS_PATH)
+        val request = requestBuilder.request(makeQueryString(defaults.keys), Api.EXPERIMENTS_PATH)
 
         okHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("Client", "onFailure: ", e)
                 onErrorListener.onError(e)
+                prefs.experimentsDefaults =  defaults.map { (k,v) ->
+                    ExperimentDefault(k,v)
+                }
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -75,7 +78,7 @@ internal class Client(
                 prefs.experimentsDefaults = experiments?.experiments ?: emptyList()
                 prefs.isInDebugMode = experiments?.meta?.debug ?: false
                 if (experiments?.meta?.debug == true) {
-                    fetchExperimentsFull(timeoutMillis, defaultKeys, onSuccessListener, onErrorListener)
+                    fetchExperimentsFull(timeoutMillis, defaults.keys, onSuccessListener, onErrorListener)
                 } else {
                     onSuccessListener.onSuccess()
                 }

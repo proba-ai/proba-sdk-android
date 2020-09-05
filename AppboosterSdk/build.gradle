@@ -3,17 +3,11 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'maven-publish'
+apply plugin: "org.jetbrains.dokka"
 
 android {
-    compileSdkVersion 29
-
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 29
-        versionCode 1
-        versionName "0.0.1"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
 
@@ -25,18 +19,72 @@ android {
     }
 }
 
+dokka {
+    outputFormat = 'markdown'
+    outputDirectory = "$buildDir/javadoc"
+
+    configuration {
+        sourceLink {
+            // Unix based directory relative path to the root of the project (where you execute gradle respectively).
+            path = "src/main/java" // or simply "./"
+
+            // URL showing where the source code can be accessed through the web browser
+            url = "https://github.com/appbooster/appbooster-sdk-android/tree/master/AppboosterSdk/src/main/java/" //remove src/main/kotlin if you use "./" above
+
+            // Suffix which is used to append the line number to the URL. Use #L for GitHub
+            lineSuffix = "#L"
+        }
+    }
+}
+
+task androidJavadocsJar(type: Jar, dependsOn: dokka) {
+    archiveClassifier.set('javadoc')
+    from dokka.outputDirectory
+}
+
+task androidSourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    archiveClassifier.set('sources')
+    include("**/AppboosterSdk.kt")
+}
+
+
 afterEvaluate {
     publishing {
         publications {
-            // Creates a Maven publication called "release".
             release(MavenPublication) {
-                // Applies the component for the release build variant.
                 from components.release
 
-                // You can then customize attributes of the publication as shown below.
-                groupId = 'com.appbooster.appboostersdk'
+                groupId = group
                 artifactId = 'appboostersdk'
-                version = '0.0.1'
+                version = version
+
+                artifact androidJavadocsJar
+                artifact androidSourcesJar
+
+                pom {
+                    name = 'Appbooster Android SDK'
+                    description = 'Appbooster mobile SDK for Android platform'
+                    url = 'https://github.com/appbooster/appbooster-sdk-android'
+                    inceptionYear = '2020'
+                    licenses {
+                        license {
+                            name = 'MIT License (MIT)'
+                            url = 'https://github.com/appbooster/appbooster-sdk-android/blob/master/LICENSE'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'alexey.ivanov'
+                            name = 'Alexey Ivanov'
+                            email = 'emoagainst@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:https://github.com/appbooster/appbooster-sdk-android.git'
+                        url = 'https://github.com/appbooster/appbooster-sdk-android'
+                    }
+                }
             }
         }
     }
@@ -47,12 +95,13 @@ dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     api 'androidx.core:core-ktx:1.3.1'
     api 'androidx.appcompat:appcompat:1.2.0'
+    api 'com.google.android.material:material:1.2.1'
     api 'com.squareup.okhttp3:okhttp:4.8.1'
     api 'com.squareup.okhttp3:logging-interceptor:4.8.1'
     api 'com.squareup.moshi:moshi:1.9.3'
     api 'io.jsonwebtoken:jjwt-api:0.11.2'
     kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.9.3'
-    runtimeOnly'io.jsonwebtoken:jjwt-impl:0.11.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'
     runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.11.2') {
         exclude group: 'org.json', module: 'json' //provided by Android natively
     }
