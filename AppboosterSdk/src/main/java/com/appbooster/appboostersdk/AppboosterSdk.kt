@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Context.SENSOR_SERVICE
 import android.hardware.SensorManager
 import android.os.SystemClock
-import android.util.Log
 import java.util.*
 
 /*
@@ -32,27 +31,37 @@ import java.util.*
  */
 
 /**
- * Example Javadoc For AppboosterSdk
- *
+ * Entry point for the Appbooster Sdk for Android
  * */
 public class AppboosterSdk private constructor(
-    private val sdkToken: String,
-    private val appId: String,
-    private var deviceId: String,
-    private var usingShake: Boolean,
+    applicationContext: Context,
+    sdkToken: String,
+    appId: String,
+    deviceId: String,
+    usingShake: Boolean,
+    connectionTimeout: Long,
+    private val isInDebugMode: Boolean,
     private val defaults: Map<String, String>,
-    private val store: Store,
-    sensorManager: SensorManager,
-    private val applicationContext: Context
+    private val store: Store
 ) {
 
     private var mLastShakeTime: Long = -1L
+    private val client: Client =
+        Client(store, appId, deviceId, sdkToken, connectionTimeout)
 
     init {
-        if (usingShake) {
+        Logger.LOG = isInDebugMode || BuildConfig.DEBUG
+
+        if (store.experimentsDefaults.isEmpty()) {
+            store.experimentsDefaults = defaults.map { (k, v) ->
+                Experiment(k, v)
+            }
+        }
+
+        if (usingShake && isInDebugMode) {
+            val sensorManager = applicationContext.getSystemService(SENSOR_SERVICE) as SensorManager
             val shakeDetector = ShakeDetector(object : ShakeDetector.Listener {
                 override fun hearShake() {
-                    Log.d("AppboosterSdk", "Shake heard")
                     if (!store.isInDebugMode) {
                         return
                     }
@@ -61,7 +70,6 @@ public class AppboosterSdk private constructor(
                         return
                     }
                     mLastShakeTime = shakeTime
-                    Log.d("AppboosterSdk", "Shake passed")
                     AppboosterDebugActivity.launch(applicationContext)
                 }
 
@@ -70,44 +78,132 @@ public class AppboosterSdk private constructor(
         }
     }
 
-    private val client: Client = Client(store, appId, deviceId, sdkToken)
+    /** Returns list of {@link Experiment} applied to current device
+     */
+    val experiments: List<Experiment>
+        get() {
+            return if (store.isInDebugMode && isInDebugMode) {
+                store.experimentsDefaults
+                    .map { experiment ->
+                        val debugExperiment =
+                            store.experimentsDebug.firstOrNull { debug -> experiment.key == debug.value }
+                        Experiment(experiment.key, debugExperiment?.value ?: experiment.value)
+                    }
+            } else {
+                store.experimentsDefaults
+            }
+        }
+
+    /** Returns the latest fetch experiments operation duration
+     */
+    val lastOperationDurationMillis: Long
+        get() {
+            return client.lastOperationDurationMillis
+        }
 
     /**
-     * Example javadoc for fetch
-     * @param timeoutMillis: connection timeout
+     * Asynchronously fetches experiments from the Appbooster servers.
      * */
-    fun fetch(timeoutMillis: Long = 30000L, onSuccessListener: OnSuccessListener, onErrorListener: OnErrorListener) {
-        client.fetchExperimentsShort(timeoutMillis, defaults, onSuccessListener, onErrorListener)
+    fun fetch(onSuccessListener: OnSuccessListener, onErrorListener: OnErrorListener) {
+        client.fetchExperimentsShort(defaults, onSuccessListener, onErrorListener)
     }
 
+    /**
+     * Returns value of experiment specified by the given key as {@link String}
+     *
+     * @param key: Experiment key
+     *
+     * @returns {@link String} representing the value of the experiment.
+     * */
+    @JvmName("getValue")
     operator fun get(key: String): String? = value(key)
-    fun value(key: String): String? = if (store.isInDebugMode) {
-        store.experimentsDebugDefaults.firstOrNull { it.key == key }?.value ?: store.experimentsDefaults.firstOrNull { it.key == key }?.value
+
+    private fun value(key: String): String? = if (store.isInDebugMode && isInDebugMode) {
+        store.experimentsDebug.firstOrNull { it.key == key }?.value
+            ?: store.experimentsDefaults.firstOrNull { it.key == key }?.value
     } else {
         store.experimentsDefaults.firstOrNull { it.key == key }?.value
     }
 
-    class Builder(private val context: Context) {
+
+    /** Builder for a {@link AppboosterSdk}. */
+    public class Builder(private val context: Context) {
         private var sdkToken: String? = null
         private var appId: String? = null
         private var deviceId: String? = null
         private var usingShake: Boolean = true
+        private var connectionTimeout: Long = 3000L
+        private var isInDebugMode: Boolean = true
         private var defaults: Map<String, String> = emptyMap()
 
         private val store = Store.getInstance(context.applicationContext)
-        private val sensorManager = context.applicationContext.getSystemService(SENSOR_SERVICE) as SensorManager
 
+        /**
+         * Sets Appbooster SDK Token.
+         *
+         * @param sdkToken to be applied.
+         */
         fun sdkToken(sdkToken: String) = apply { this.sdkToken = sdkToken }
+
+        /**
+         * Sets Appbooster AppId.
+         *
+         * @param appId to be applied.
+         */
         fun appId(appId: String) = apply { this.appId = appId }
+
+        /**
+         * Sets unique deviceId.
+         *
+         * @param deviceId to be applied. UUID generated by default.
+         */
         fun deviceId(deviceId: String) = apply { this.deviceId = deviceId }
-        fun usingShake(usingShake: Boolean = true) = apply { this.usingShake = usingShake }
+
+        /**
+         * Turns the shake motion to show ${@link AppboosterDebugActivity} on or off.
+         *
+         * @param enable Should be <code>true</code> to enable, or <code>false</code> to disable this
+         *     setting. <code>true</code> by default.
+         */
+        fun usingShake(enable: Boolean = true) = apply { this.usingShake = enable }
+
+        /**
+         * Sets the timeout for fetch requests to the Appbooster servers in milliseconds.
+         *
+         * <p>A fetch call will fail if it takes longer than the specified timeout to fetch data
+         * from the Appbooster servers. Previously fetched experiments values or experiments defaults will be applied.
+         *
+         * @param duration Timeout duration in millseconds.
+         */
+        fun fetchTimeout(duration: Long = 3000L) = apply { this.connectionTimeout = duration }
+
+        /**
+         * Turns the debug mode on or off.
+         *
+         * @param enable Should be <code>true</code> to enable, or <code>false</code> to disable this
+         *     setting. <code>false</code> by default.
+         */
+        fun isInDebugMode(enable: Boolean = false) = apply { this.isInDebugMode = enable }
+
+        /**
+         * Sets default experiments key/value map to fetch from the Appbooster servers and fallback in case of failed fetch.
+         *
+         * @param defaults Experiments key/value map.
+         */
         fun defaults(defaults: Map<String, String>) = apply { this.defaults = defaults }
+
+        /**
+         * Returns a {@link AppboosterSdk}.
+         */
         fun build(): AppboosterSdk {
             if (sdkToken.isNullOrEmpty()) {
                 throw AppboosterSetupException("SDK Token must not be null")
             }
             if (appId.isNullOrEmpty()) {
                 throw AppboosterSetupException("Appbooster App id must not be null")
+            }
+            if (connectionTimeout <= 0) {
+                throw AppboosterSetupException("Appbooster connectionTimeout can not be zero or negative")
             }
             if (deviceId.isNullOrEmpty()) {
                 deviceId =
@@ -116,7 +212,17 @@ public class AppboosterSdk private constructor(
             }
             store.deviceId = deviceId
 
-            return AppboosterSdk(sdkToken!!, appId!!, deviceId!!, usingShake, defaults, store, sensorManager, context.applicationContext)
+            return AppboosterSdk(
+                context.applicationContext,
+                sdkToken!!,
+                appId!!,
+                deviceId!!,
+                usingShake,
+                connectionTimeout,
+                isInDebugMode,
+                defaults,
+                store
+            )
         }
     }
 
@@ -125,6 +231,6 @@ public class AppboosterSdk private constructor(
     }
 
     interface OnErrorListener {
-        fun onError(throwable: Throwable)
+        fun onError(th: Throwable)
     }
 }

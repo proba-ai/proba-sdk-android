@@ -1,6 +1,6 @@
 package com.appbooster.appboostersdk
 
-import android.util.Log
+import android.os.SystemClock
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
@@ -37,48 +37,69 @@ internal class Client(
     private val prefs: Store,
     appId: String,
     deviceId: String,
-    token: String
+    token: String,
+    connectionTimeout: Long
 ) {
 
-    private val okHttpClientBuilder = OkHttpClient.Builder()
-        .connectTimeout(3000, TimeUnit.MILLISECONDS)
+    private val okHttpClient = OkHttpClient.Builder()
+        .connectTimeout(connectionTimeout, TimeUnit.MILLISECONDS)
         .addInterceptor(HttpLoggingInterceptor()
-            .apply { setLevel(HttpLoggingInterceptor.Level.BODY) }
+            .apply {
+                setLevel(
+                    if (BuildConfig.DEBUG) {
+                        HttpLoggingInterceptor.Level.BODY
+                    } else {
+                        HttpLoggingInterceptor.Level.NONE
+                    }
+                )
+            }
         )
+        .build()
     private val requestBuilder = RequestBuilder(appId, deviceId, token)
     private val jsonAdapters = JsonAdapters
 
+    internal var lastOperationDurationMillis: Long = -1
+
     internal fun fetchExperimentsShort(
-        timeoutMillis: Long,
         defaults: Map<String, String>,
         onSuccessListener: AppboosterSdk.OnSuccessListener,
         onErrorListener: AppboosterSdk.OnErrorListener
     ) {
-        val okHttpClient = okHttpClientBuilder.connectTimeout(timeoutMillis, TimeUnit.MILLISECONDS).build()
         val request = requestBuilder.request(makeQueryString(defaults.keys), Api.EXPERIMENTS_PATH)
-
+        val fetchTimeStartMillis = SystemClock.elapsedRealtime()
         okHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("Client", "onFailure: ", e)
-                onErrorListener.onError(e)
-                prefs.experimentsDefaults =  defaults.map { (k,v) ->
-                    ExperimentDefault(k,v)
-                }
+                Logger.e("AppboosterSdk", "New Failure:", e)
+                lastOperationDurationMillis = SystemClock.elapsedRealtime() - fetchTimeStartMillis
+                onErrorListener.onError(AppboosterFetchException(e))
+
             }
 
             override fun onResponse(call: Call, response: Response) {
+                lastOperationDurationMillis = SystemClock.elapsedRealtime() - fetchTimeStartMillis
                 if (!response.isSuccessful) {
-                    val error = jsonAdapters.adapterFor(Error::class.java).fromJson(response.body?.string() ?: "")
-                    Log.e("AppboosterSdk", "New Failure: $error, ${response.code}")
-                    onErrorListener.onError(AppboosterFetchException(response.code, error?.error ?: ""))
+                    val error = jsonAdapters.adapterFor(Error::class.java)
+                        .fromJson(response.body?.string() ?: "")
+                    Logger.e("AppboosterSdk", "New Failure: $error, ${response.code}")
+                    onErrorListener.onError(
+                        AppboosterFetchException(
+                            response.code,
+                            error?.error ?: ""
+                        )
+                    )
                     return
                 }
-                val experiments = jsonAdapters.adapterFor(ExperimentResponse::class.java).fromJson(response.body?.string() ?: "")
+                val experiments = jsonAdapters.adapterFor(ExperimentResponse::class.java)
+                    .fromJson(response.body?.string() ?: "")
 
                 prefs.experimentsDefaults = experiments?.experiments ?: emptyList()
                 prefs.isInDebugMode = experiments?.meta?.debug ?: false
                 if (experiments?.meta?.debug == true) {
-                    fetchExperimentsFull(timeoutMillis, defaults.keys, onSuccessListener, onErrorListener)
+                    fetchExperimentsFull(
+                        defaults.keys,
+                        onSuccessListener,
+                        onErrorListener
+                    )
                 } else {
                     onSuccessListener.onSuccess()
                 }
@@ -87,12 +108,10 @@ internal class Client(
     }
 
     private fun fetchExperimentsFull(
-        timeoutMillis: Long,
         defaultKeys: Set<String>,
         onSuccessListener: AppboosterSdk.OnSuccessListener,
         onErrorListener: AppboosterSdk.OnErrorListener
     ) {
-        val okHttpClient = okHttpClientBuilder.connectTimeout(timeoutMillis, TimeUnit.MILLISECONDS).build()
         val request = requestBuilder.request(
             makeQueryString(defaultKeys),
             Api.EXPERIMENTS_PATH,
@@ -101,23 +120,33 @@ internal class Client(
 
         okHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("AppboosterSdk", "New Failure: ", e)
-                onErrorListener.onError(e)
+                Logger.e("AppboosterSdk", "New Failure: ", e)
+                onErrorListener.onError(AppboosterFetchException(e))
             }
 
             override fun onResponse(call: Call, response: Response) {
                 if (!response.isSuccessful) {
-                    val error = jsonAdapters.adapterFor(Error::class.java).fromJson(response.body?.string() ?: "")
-                    Log.e("AppboosterSdk", "New Failure: $error, ${response.code}")
-                    onErrorListener.onError(AppboosterFetchException(response.code, error?.error ?: ""))
+                    val error = jsonAdapters.adapterFor(Error::class.java)
+                        .fromJson(response.body?.string() ?: "")
+                    Logger.e("AppboosterSdk", "New Failure: $error, ${response.code}")
+                    onErrorListener.onError(
+                        AppboosterFetchException(
+                            response.code,
+                            error?.error ?: ""
+                        )
+                    )
                     return
                 }
-                val experimentsResponse = jsonAdapters.adapterFor(CompositeExperimentResponse::class.java).fromJson(response.body?.string() ?: "")
+                val experimentsResponse =
+                    jsonAdapters.adapterFor(CompositeExperimentResponse::class.java)
+                        .fromJson(response.body?.string() ?: "")
                 val finishedExperiments = experimentsResponse?.experiments
                     ?.filter { it.status == ExperimentStatus.FINISHED }
                     ?.map { experiment ->
-                        val default = prefs.experimentsDefaults.first { defaults -> defaults.key == experiment.key }
-                        val defaultOption = experiment.options.first { option -> option.value == default.value }
+                        val default =
+                            prefs.experimentsDefaults.first { defaults -> defaults.key == experiment.key }
+                        val defaultOption =
+                            experiment.options.first { option -> option.value == default.value }
                         val finishedExperiment = CompositeExperiment(
                             name = experiment.name,
                             key = experiment.key,
@@ -136,14 +165,13 @@ internal class Client(
         })
     }
 
-    private fun makeQueryString(defaultKeys: Set<String>): String = defaultKeys.joinToString("&") { "knownKeys[]=$it" }
+    private fun makeQueryString(defaultKeys: Set<String>): String =
+        defaultKeys.joinToString("&") { "knownKeys[]=$it" }
 }
 
 internal interface Api {
 
     companion object {
-        internal const val STAGING_HOST = "https://staging.appbooster.com"
-        internal const val PRODUCTION_HOST = "https://api.appbooster.com"
         internal const val MOBILE_API_PATH = "api/mobile"
         internal const val EXPERIMENTS_PATH = "experiments"
         internal const val OPTIONS_PATH = "options"
@@ -160,13 +188,13 @@ internal class RequestBuilder(
         .addHeader(sdkAppIdHeader.first, sdkAppIdHeader.second)
         .addHeader(authorizationHeader.first, authorizationHeader.second)
         .addHeader(appVersionHeader.first, appVersionHeader.second)
-        .url("${Api.STAGING_HOST}/${Api.MOBILE_API_PATH}/${paths.joinToString("/") { it }}?$query")
+        .url("${BuildConfig.API_HOST}/${Api.MOBILE_API_PATH}/${paths.joinToString("/") { it }}?$query")
         .build()
 
     private val contentTypeHeader = "Content-Type" to "application/json"
     private val sdkAppIdHeader = "SDK-App-ID" to appId
     private val authorizationHeader = "Authorization" to "Bearer ${makeAccessToken()}"
-    private val appVersionHeader = "AppVersion" to BuildConfig.VERSION_CODE.toString()
+    private val appVersionHeader = "AppVersion" to BuildConfig.VERSION_NAME.toString()
 
     private fun makeAccessToken(): String {
         return Jwts.builder()

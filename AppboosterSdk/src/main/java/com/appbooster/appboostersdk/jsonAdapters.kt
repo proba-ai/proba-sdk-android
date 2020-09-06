@@ -33,8 +33,8 @@ internal object JsonAdapters {
         .build()
 
     internal fun <T> adapterFor(type: Class<T>) = parser.adapter<T>(type)
-    internal fun adapterForExperimentsDefaults(): JsonAdapter<List<ExperimentDefault>> {
-        val type = Types.newParameterizedType(List::class.java, ExperimentDefault::class.java)
+    internal fun adapterForExperimentsDefaults(): JsonAdapter<List<Experiment>> {
+        val type = Types.newParameterizedType(List::class.java, Experiment::class.java)
         return parser.adapter(type)
     }
 

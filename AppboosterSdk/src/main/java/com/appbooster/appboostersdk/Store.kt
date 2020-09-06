@@ -29,7 +29,6 @@ import android.content.SharedPreferences
 
 internal class Store private constructor(private val prefs: SharedPreferences) {
 
-
     private val jsonAdapters = JsonAdapters
 
     internal var deviceId: String?
@@ -50,7 +49,7 @@ internal class Store private constructor(private val prefs: SharedPreferences) {
             prefs.edit().putString(SHARED_PREFERENCES_EXPERIMENTS_KEY, json).apply()
         }
 
-    internal var experimentsDefaults: List<ExperimentDefault>
+    internal var experimentsDefaults: List<Experiment>
         get () {
             val json = prefs.getString(SHARED_PREFERENCES_EXPERIMENTS_DEFAULTS_KEY, "[]")!!
             return jsonAdapters.adapterForExperimentsDefaults().fromJson(json) ?: emptyList()
@@ -60,7 +59,7 @@ internal class Store private constructor(private val prefs: SharedPreferences) {
             prefs.edit().putString(SHARED_PREFERENCES_EXPERIMENTS_DEFAULTS_KEY, json).apply()
         }
 
-    internal var experimentsDebugDefaults: List<ExperimentDefault>
+    internal var experimentsDebug: List<Experiment>
         get () {
             val json = prefs.getString(SHARED_PREFERENCES_EXPERIMENTS_DEBUG_DEFAULTS_KEY, "[]")!!
             return jsonAdapters.adapterForExperimentsDefaults().fromJson(json) ?: emptyList()

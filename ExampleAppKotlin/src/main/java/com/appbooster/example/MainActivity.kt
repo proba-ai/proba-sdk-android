@@ -24,12 +24,16 @@ class MainActivity : AppCompatActivity() {
             override fun onSuccess() {
                 val def1_op = sdk["android_1"]
                 Log.d("MainActivity", "def1_op: $def1_op")
-                val def1_val = sdk.value("android_1")
-                Log.d("MainActivity", "def1_val: $def1_val")
+                Log.d("MainActivity", "Experiments: ${sdk.experiments}")
+                Log.d("MainActivity", "Fetch duration: ${sdk.lastOperationDurationMillis}")
             }
         },
         onErrorListener = object: AppboosterSdk.OnErrorListener{
             override fun onError(throwable: Throwable) {
+                val def1_op = sdk["android_1"]
+                Log.d("MainActivity", "def1_op: $def1_op")
+                Log.d("MainActivity", "Experiments: ${sdk.experiments}")
+                Log.d("MainActivity", "Fetch duration: ${sdk.lastOperationDurationMillis}")
             }
         })
     }

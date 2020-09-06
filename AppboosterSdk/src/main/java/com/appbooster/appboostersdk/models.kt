@@ -27,15 +27,15 @@ import com.squareup.moshi.JsonClass
  */
 
 @JsonClass(generateAdapter = true)
-internal data class ExperimentResponse(
-    var experiments: List<ExperimentDefault> = emptyList(),
-    var meta: Meta = Meta.DEFAULT
+data class Experiment (
+    var key: String = "",
+    var value: String = ""
 )
 
 @JsonClass(generateAdapter = true)
-internal data class ExperimentDefault (
-    var key: String = "",
-    var value: String = ""
+internal data class ExperimentResponse(
+    var experiments: List<Experiment> = emptyList(),
+    var meta: Meta = Meta.DEFAULT
 )
 
 @JsonClass(generateAdapter = true)

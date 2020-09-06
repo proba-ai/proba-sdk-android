@@ -28,15 +28,14 @@ class AppboosterDebugActivity : AppCompatActivity() {
         val container = findViewById<ViewGroup>(R.id.appboosterExperimentsContainer)
 
         findViewById<ImageButton>(R.id.appboosterSaveButton).setOnClickListener {
-            store.experimentsDebugDefaults = mExperimentsDebugDefaults
+            store.experimentsDebug = mExperimentsDebugDefaults
                 .map { (k,v) ->
-                    Log.d("Appbooster", "Map $k, $v on debug ExperimentDefault")
-                    ExperimentDefault(k, v)
+                    Experiment(k, v)
                 }
             finish()
         }
         findViewById<Button>(R.id.appboosterResetButton).setOnClickListener {
-            store.experimentsDebugDefaults = emptyList()
+            store.experimentsDebug = emptyList()
             container.removeAllViews()
             store.experiments
                 .map {
@@ -67,7 +66,7 @@ class AppboosterDebugActivity : AppCompatActivity() {
             text = experiment.key
         }
         val receivedOption = store.experimentsDefaults.firstOrNull { it.key == experiment.key }?.value ?: ""
-        val defaultOption = store.experimentsDebugDefaults.firstOrNull { it.key == experiment.key }?.value?: receivedOption
+        val defaultOption = store.experimentsDebug.firstOrNull { it.key == experiment.key }?.value?: receivedOption
         experimentContainer.findViewById<ViewGroup>(R.id.appboosterExperimentOptionsTextLayout).apply {
             experiment.options
                 .map {
@@ -91,7 +90,6 @@ class AppboosterDebugActivity : AppCompatActivity() {
 
             setOnCheckedChangeListener { group, checkedId ->
                 val checkedOption = group.findViewById<View>(checkedId).tag as ExperimentOptionTag
-                Log.d("Appbooster", "Checked option: $checkedOption")
                 mExperimentsDebugDefaults[checkedOption.key] = checkedOption.option
             }
         }
