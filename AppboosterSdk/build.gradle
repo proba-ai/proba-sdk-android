@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 apply plugin: "org.jetbrains.dokka"
 
 android {
@@ -123,6 +124,28 @@ afterEvaluate {
                         url = 'https://github.com/appbooster/appbooster-sdk-android'
                     }
                 }
+            }
+        }
+    }
+}
+
+afterEvaluate {
+    bintray {
+        user = System.getenv('BINTRAY_USER')
+        key = System.getenv('BINTRAY_KEY')
+        publications = ['release']
+        pkg {
+            repo = 'appbooster_sdk'
+            name = 'Appbooster Android SDK'
+            userOrg = 'appbooster'
+            licenses = ['MIT License (MIT)']
+            vcsUrl = 'https://github.com/appbooster/appbooster-sdk-android'
+
+            version {
+                name = version
+                desc = "Appbooster Android SDK $version"
+                released  = new Date()
+                vcsTag = version
             }
         }
     }
