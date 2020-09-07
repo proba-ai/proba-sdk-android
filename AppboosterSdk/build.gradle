@@ -131,21 +131,21 @@ afterEvaluate {
 
 afterEvaluate {
     bintray {
-        user = System.getenv('BINTRAY_USER')
-        key = System.getenv('BINTRAY_KEY')
+        user = System.getenv("BINTRAY_USER")
+        key = System.getenv("BINTRAY_KEY")
         publications = ['release']
         pkg {
             repo = 'appbooster_sdk'
-            name = 'Appbooster Android SDK'
+            name = 'appbooster_android_sdk'
             userOrg = 'appbooster'
             licenses = ['MIT License (MIT)']
             vcsUrl = 'https://github.com/appbooster/appbooster-sdk-android'
 
             version {
-                name = version
-                desc = "Appbooster Android SDK $version"
+                name = rootProject.ext.appboosterSdkVersion
+                desc = "Appbooster Android SDK ${rootProject.ext.appboosterSdkVersion}"
                 released  = new Date()
-                vcsTag = version
+                vcsTag = rootProject.ext.appboosterSdkVersion
             }
         }
     }
