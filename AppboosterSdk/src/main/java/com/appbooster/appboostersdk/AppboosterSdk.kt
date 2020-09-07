@@ -47,7 +47,7 @@ public class AppboosterSdk private constructor(
 
     private var mLastShakeTime: Long = -1L
     private val client: Client =
-        Client(store, appId, deviceId, sdkToken, connectionTimeout)
+        Client(store, appId, deviceId, sdkToken, connectionTimeout, isInDevMode)
 
     init {
         Logger.LOG = isInDevMode || BuildConfig.DEBUG
@@ -81,7 +81,7 @@ public class AppboosterSdk private constructor(
      */
     val experiments: List<Experiment>
         get() {
-            return if (store.isInDebugMode && isInDevMode) {
+            return if (store.isInDebugMode) {
                 store.experimentsDefaults
                     .map { experiment ->
                         val debugExperiment =
@@ -117,7 +117,7 @@ public class AppboosterSdk private constructor(
     @JvmName("getValue")
     operator fun get(key: String): String? = value(key)
 
-    private fun value(key: String): String? = if (store.isInDebugMode && isInDevMode) {
+    private fun value(key: String): String? = if (store.isInDebugMode) {
         store.experimentsDebug.firstOrNull { it.key == key }?.value
             ?: store.experimentsDefaults.firstOrNull { it.key == key }?.value
     } else {
@@ -132,7 +132,7 @@ public class AppboosterSdk private constructor(
         private var deviceId: String? = null
         private var usingShake: Boolean = true
         private var connectionTimeout: Long = 3000L
-        private var isInDevMode: Boolean = true
+        private var isInDevMode: Boolean = false
         private var defaults: Map<String, String> = emptyMap()
 
         private val store = Store.getInstance(context.applicationContext)

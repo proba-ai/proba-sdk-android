@@ -1,9 +1,12 @@
 package com.appbooster.example
 
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.appbooster.appboostersdk.AppboosterSdk
+import com.google.android.material.button.MaterialButton
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -11,29 +14,25 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val sdk = AppboosterSdk.Builder(this)
-            .appId("657")
-            .sdkToken("e3b0c44298fc1c149afbf4c8996fb924")
-            .usingShake(true)
+            .appId("11314")
+            .sdkToken("94EBA72B439D4A18B971231088C77D5F")
             .defaults(mapOf(
-                "android_1" to "",
-                "android_2" to ""
+                "buttonColor" to "blue"
             ))
             .build()
 
+        if (sdk["buttonColor"] != null) {
+            appboosterExampleButton.setBackgroundColor(Color.parseColor(sdk["buttonColor"]))
+        }
+
         sdk.fetch(onSuccessListener = object: AppboosterSdk.OnSuccessListener{
             override fun onSuccess() {
-                val def1_op = sdk["android_1"]
-                Log.d("MainActivity", "def1_op: $def1_op")
-                Log.d("MainActivity", "Experiments: ${sdk.experiments}")
-                Log.d("MainActivity", "Fetch duration: ${sdk.lastOperationDurationMillis}")
+                appboosterExampleButton.setBackgroundColor(Color.parseColor(sdk["buttonColor"]))
             }
         },
         onErrorListener = object: AppboosterSdk.OnErrorListener{
             override fun onError(throwable: Throwable) {
-                val def1_op = sdk["android_1"]
-                Log.d("MainActivity", "def1_op: $def1_op")
-                Log.d("MainActivity", "Experiments: ${sdk.experiments}")
-                Log.d("MainActivity", "Fetch duration: ${sdk.lastOperationDurationMillis}")
+
             }
         })
     }

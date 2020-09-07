@@ -38,7 +38,8 @@ internal class Client(
     appId: String,
     deviceId: String,
     token: String,
-    connectionTimeout: Long
+    connectionTimeout: Long,
+    isInDevMode: Boolean
 ) {
 
     private val okHttpClient = OkHttpClient.Builder()
@@ -46,7 +47,7 @@ internal class Client(
         .addInterceptor(HttpLoggingInterceptor()
             .apply {
                 setLevel(
-                    if (BuildConfig.DEBUG) {
+                    if (isInDevMode || BuildConfig.DEBUG) {
                         HttpLoggingInterceptor.Level.BODY
                     } else {
                         HttpLoggingInterceptor.Level.NONE
@@ -188,15 +189,20 @@ internal class RequestBuilder(
     private val contentTypeHeader = "Content-Type" to "application/json"
     private val sdkAppIdHeader = "SDK-App-ID" to appId
     private val authorizationHeader = "Authorization" to "Bearer ${makeAccessToken()}"
-    private val appVersionHeader = "AppVersion" to BuildConfig.VERSION_NAME.toString()
+    private val appVersionHeader = "AppVersion" to BuildConfig.VERSION_NAME
 
     private fun makeAccessToken(): String {
-        return Jwts.builder()
-            .setHeaderParam("alg", "HS256")
-            .setHeaderParam("typ", "JWT")
-            .claim("deviceId", deviceId)
-            .signWith(Keys.hmacShaKeyFor(token.toByteArray()), SignatureAlgorithm.HS256)
-            .compact()
+        try {
+            return Jwts.builder()
+                .setHeaderParam("alg", "HS256")
+                .setHeaderParam("typ", "JWT")
+                .claim("deviceId", deviceId)
+                .signWith(Keys.hmacShaKeyFor(token.toByteArray()), SignatureAlgorithm.HS256)
+                .compact()
+        }
+        catch(e: Throwable) {
+            throw AppboosterSetupException("Illegal sdk token size causes", e)
+        }
     }
 }
 
