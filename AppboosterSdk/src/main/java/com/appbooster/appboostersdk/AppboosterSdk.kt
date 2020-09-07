@@ -40,7 +40,7 @@ public class AppboosterSdk private constructor(
     deviceId: String,
     usingShake: Boolean,
     connectionTimeout: Long,
-    private val isInDebugMode: Boolean,
+    private val isInDevMode: Boolean,
     private val defaults: Map<String, String>,
     private val store: Store
 ) {
@@ -50,7 +50,7 @@ public class AppboosterSdk private constructor(
         Client(store, appId, deviceId, sdkToken, connectionTimeout)
 
     init {
-        Logger.LOG = isInDebugMode || BuildConfig.DEBUG
+        Logger.LOG = isInDevMode || BuildConfig.DEBUG
 
         if (store.experimentsDefaults.isEmpty()) {
             store.experimentsDefaults = defaults.map { (k, v) ->
@@ -58,7 +58,7 @@ public class AppboosterSdk private constructor(
             }
         }
 
-        if (usingShake && isInDebugMode) {
+        if (usingShake) {
             val sensorManager = applicationContext.getSystemService(SENSOR_SERVICE) as SensorManager
             val shakeDetector = ShakeDetector(object : ShakeDetector.Listener {
                 override fun hearShake() {
@@ -72,7 +72,6 @@ public class AppboosterSdk private constructor(
                     mLastShakeTime = shakeTime
                     AppboosterDebugActivity.launch(applicationContext)
                 }
-
             })
             shakeDetector.start(sensorManager)
         }
@@ -82,7 +81,7 @@ public class AppboosterSdk private constructor(
      */
     val experiments: List<Experiment>
         get() {
-            return if (store.isInDebugMode && isInDebugMode) {
+            return if (store.isInDebugMode && isInDevMode) {
                 store.experimentsDefaults
                     .map { experiment ->
                         val debugExperiment =
@@ -105,7 +104,7 @@ public class AppboosterSdk private constructor(
      * Asynchronously fetches experiments from the Appbooster servers.
      * */
     fun fetch(onSuccessListener: OnSuccessListener, onErrorListener: OnErrorListener) {
-        client.fetchExperimentsShort(defaults, onSuccessListener, onErrorListener)
+        client.fetchExperiments(defaults, onSuccessListener, onErrorListener)
     }
 
     /**
@@ -118,7 +117,7 @@ public class AppboosterSdk private constructor(
     @JvmName("getValue")
     operator fun get(key: String): String? = value(key)
 
-    private fun value(key: String): String? = if (store.isInDebugMode && isInDebugMode) {
+    private fun value(key: String): String? = if (store.isInDebugMode && isInDevMode) {
         store.experimentsDebug.firstOrNull { it.key == key }?.value
             ?: store.experimentsDefaults.firstOrNull { it.key == key }?.value
     } else {
@@ -133,7 +132,7 @@ public class AppboosterSdk private constructor(
         private var deviceId: String? = null
         private var usingShake: Boolean = true
         private var connectionTimeout: Long = 3000L
-        private var isInDebugMode: Boolean = true
+        private var isInDevMode: Boolean = true
         private var defaults: Map<String, String> = emptyMap()
 
         private val store = Store.getInstance(context.applicationContext)
@@ -178,12 +177,12 @@ public class AppboosterSdk private constructor(
         fun fetchTimeout(duration: Long = 3000L) = apply { this.connectionTimeout = duration }
 
         /**
-         * Turns the debug mode on or off.
+         * Turns the developer mode on or off.
          *
          * @param enable Should be <code>true</code> to enable, or <code>false</code> to disable this
          *     setting. <code>false</code> by default.
          */
-        fun isInDebugMode(enable: Boolean = false) = apply { this.isInDebugMode = enable }
+        fun isInDevMode(enable: Boolean = false) = apply { this.isInDevMode = enable }
 
         /**
          * Sets default experiments key/value map to fetch from the Appbooster servers and fallback in case of failed fetch.
@@ -219,7 +218,7 @@ public class AppboosterSdk private constructor(
                 deviceId!!,
                 usingShake,
                 connectionTimeout,
-                isInDebugMode,
+                isInDevMode,
                 defaults,
                 store
             )

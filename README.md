@@ -76,14 +76,18 @@ sdk.fetch(onSuccessListener = object: AppboosterSdk.OnSuccessListener{
 
 Java:
 ```
-sdk.fetch(onSuccessListener = object: AppboosterSdk.OnSuccessListener{
-            override fun onSuccess() {
-            }
-        },
-        onErrorListener = object: AppboosterSdk.OnErrorListener{
-            override fun onError(throwable: Throwable) {
-            }
-        });
+sdk.fetch(new AppboosterSdk.OnSuccessListener() {
+              @Override
+              public void onSuccess() {
+                ...
+              }
+          },
+          new AppboosterSdk.OnErrorListener() {
+              @Override
+              public void onError(Throwable throwable) {
+                ...
+              }
+          });
 ```
 
 ### How to get the value for a specific test?
@@ -116,13 +120,22 @@ List<Experiment> experiments = sdk.getExperiments();
 
 Kotlin:
 ```
-sdk.showDebugLogs = true // false by default, to print all debugging info in the console
+AppboosterSdk.Builder(context)
+        //...
+        .isInDevMode(true) false by default, to print all debugging info in the console
+        //...
+        
+        
 val duration = sdk.lastOperationDurationMillis // the duration of the last operation in milliseconds
 ```
 
 Java:
 ```
-sdk.setShowDebugLogs(true); // false by default, to print all debugging info in the console
+AppboosterSdk.Builder(context)
+        //...
+        .isInDevMode(true) false by default, to print all debugging info in the console
+        //...
+        
 long duration = sdk.getLastOperationDurationMillis(); 
 ```
 

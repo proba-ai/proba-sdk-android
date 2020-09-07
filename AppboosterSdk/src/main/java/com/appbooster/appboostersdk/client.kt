@@ -60,7 +60,7 @@ internal class Client(
 
     internal var lastOperationDurationMillis: Long = -1
 
-    internal fun fetchExperimentsShort(
+    internal fun fetchExperiments(
         defaults: Map<String, String>,
         onSuccessListener: AppboosterSdk.OnSuccessListener,
         onErrorListener: AppboosterSdk.OnErrorListener
@@ -82,10 +82,7 @@ internal class Client(
                         .fromJson(response.body?.string() ?: "")
                     Logger.e("AppboosterSdk", "New Failure: $error, ${response.code}")
                     onErrorListener.onError(
-                        AppboosterFetchException(
-                            response.code,
-                            error?.error ?: ""
-                        )
+                        AppboosterFetchException(response.code, error?.error ?: "")
                     )
                     return
                 }
@@ -95,7 +92,7 @@ internal class Client(
                 prefs.experimentsDefaults = experiments?.experiments ?: emptyList()
                 prefs.isInDebugMode = experiments?.meta?.debug ?: false
                 if (experiments?.meta?.debug == true) {
-                    fetchExperimentsFull(
+                    fetchDebugExperiments(
                         defaults.keys,
                         onSuccessListener,
                         onErrorListener
@@ -107,7 +104,7 @@ internal class Client(
         })
     }
 
-    private fun fetchExperimentsFull(
+    private fun fetchDebugExperiments(
         defaultKeys: Set<String>,
         onSuccessListener: AppboosterSdk.OnSuccessListener,
         onErrorListener: AppboosterSdk.OnErrorListener
@@ -130,10 +127,7 @@ internal class Client(
                         .fromJson(response.body?.string() ?: "")
                     Logger.e("AppboosterSdk", "New Failure: $error, ${response.code}")
                     onErrorListener.onError(
-                        AppboosterFetchException(
-                            response.code,
-                            error?.error ?: ""
-                        )
+                        AppboosterFetchException(response.code, error?.error ?: "")
                     )
                     return
                 }
