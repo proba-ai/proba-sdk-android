@@ -83,7 +83,7 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/appboosterSaveButton"
-        app:srcCompat="@drawable/ic_check"
+        app:srcCompat="@drawable/appbooster_ic_check"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
