@@ -145,6 +145,7 @@ class AppboosterDebugActivity : AppCompatActivity() {
     private val mExperimentsDebugDefaults = HashMap<String, String>()
 
     companion object {
+        @JvmStatic
         fun launch(context: Context) {
             val intent = Intent(context, AppboosterDebugActivity::class.java)
                 .apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }

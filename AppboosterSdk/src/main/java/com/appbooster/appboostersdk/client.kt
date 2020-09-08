@@ -63,6 +63,7 @@ internal class Client(
 
     internal fun fetchExperiments(
         defaults: Map<String, String>,
+        handler: AppboosterHandler,
         onSuccessListener: AppboosterSdk.OnSuccessListener,
         onErrorListener: AppboosterSdk.OnErrorListener
     ) {
@@ -72,8 +73,7 @@ internal class Client(
             override fun onFailure(call: Call, e: IOException) {
                 Logger.e("AppboosterSdk", "New Failure:", e)
                 lastOperationDurationMillis = SystemClock.elapsedRealtime() - fetchTimeStartMillis
-                onErrorListener.onError(AppboosterFetchException(e))
-
+                handler.sendError(onErrorListener, AppboosterFetchException(e))
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -82,9 +82,8 @@ internal class Client(
                     val error = jsonAdapters.adapterFor(Error::class.java)
                         .fromJson(response.body?.string() ?: "")
                     Logger.e("AppboosterSdk", "New Failure: $error, ${response.code}")
-                    onErrorListener.onError(
-                        AppboosterFetchException(response.code, error?.error ?: "")
-                    )
+                    val th = AppboosterFetchException(response.code, error?.error ?: "")
+                    handler.sendError(onErrorListener, th)
                     return
                 }
                 val experiments = jsonAdapters.adapterFor(ExperimentResponse::class.java)
@@ -95,11 +94,12 @@ internal class Client(
                 if (experiments?.meta?.debug == true) {
                     fetchDebugExperiments(
                         defaults.keys,
+                        handler,
                         onSuccessListener,
                         onErrorListener
                     )
                 } else {
-                    onSuccessListener.onSuccess()
+                    handler.sendSuccess(onSuccessListener)
                 }
             }
         })
@@ -107,6 +107,7 @@ internal class Client(
 
     private fun fetchDebugExperiments(
         defaultKeys: Set<String>,
+        handler: AppboosterHandler,
         onSuccessListener: AppboosterSdk.OnSuccessListener,
         onErrorListener: AppboosterSdk.OnErrorListener
     ) {
@@ -119,7 +120,7 @@ internal class Client(
         okHttpClient.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Logger.e("AppboosterSdk", "New Failure: ", e)
-                onErrorListener.onError(AppboosterFetchException(e))
+                handler.sendError(onErrorListener, AppboosterFetchException(e))
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -127,9 +128,8 @@ internal class Client(
                     val error = jsonAdapters.adapterFor(Error::class.java)
                         .fromJson(response.body?.string() ?: "")
                     Logger.e("AppboosterSdk", "New Failure: $error, ${response.code}")
-                    onErrorListener.onError(
-                        AppboosterFetchException(response.code, error?.error ?: "")
-                    )
+                    val th = AppboosterFetchException(response.code, error?.error ?: "")
+                    handler.sendError(onErrorListener, th)
                     return
                 }
                 val experimentsResponse =
@@ -155,7 +155,7 @@ internal class Client(
                     ?.filter { it.status != ExperimentStatus.FINISHED }
                     ?: emptyList()
                 prefs.experiments = finishedExperiments + otherExperiments
-                onSuccessListener.onSuccess()
+                handler.sendSuccess(onSuccessListener)
             }
         })
     }

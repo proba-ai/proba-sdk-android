@@ -3,6 +3,7 @@ package com.appbooster.appboostersdk
 import android.content.Context
 import android.content.Context.SENSOR_SERVICE
 import android.hardware.SensorManager
+import android.os.Looper
 import android.os.SystemClock
 import java.util.*
 
@@ -46,8 +47,8 @@ public class AppboosterSdk private constructor(
 ) {
 
     private var mLastShakeTime: Long = -1L
-    private val client: Client =
-        Client(store, appId, deviceId, sdkToken, connectionTimeout, isInDevMode)
+    private val client: Client = Client(store, appId, deviceId, sdkToken, connectionTimeout, isInDevMode)
+    private val handler: AppboosterHandler = AppboosterHandler()
 
     init {
         Logger.LOG = isInDevMode || BuildConfig.DEBUG
@@ -105,7 +106,7 @@ public class AppboosterSdk private constructor(
      * Asynchronously fetches experiments from the Appbooster servers.
      * */
     fun fetch(onSuccessListener: OnSuccessListener, onErrorListener: OnErrorListener) {
-        client.fetchExperiments(defaults, onSuccessListener, onErrorListener)
+        client.fetchExperiments(defaults, handler, onSuccessListener, onErrorListener)
     }
 
     /**
@@ -212,6 +213,11 @@ public class AppboosterSdk private constructor(
                     store.deviceId
                         ?: UUID.randomUUID().toString()
             }
+
+            if (Looper.getMainLooper().thread != Thread.currentThread()) {
+                throw AppboosterSetupException("Appbooster SDK should been initialized in main thread")
+            }
+
             store.deviceId = deviceId
 
             return AppboosterSdk(
