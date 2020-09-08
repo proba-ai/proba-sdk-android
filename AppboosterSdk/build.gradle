@@ -135,8 +135,8 @@ afterEvaluate {
         key = System.getenv("BINTRAY_KEY")
         publications = ['release']
         pkg {
-            repo = 'appbooster_sdk'
-            name = 'appbooster_android_sdk'
+            repo = 'appbooster_android_sdk'
+            name = 'experiments_sdk'
             userOrg = 'appbooster'
             licenses = ['MIT License (MIT)']
             vcsUrl = 'https://github.com/appbooster/appbooster-sdk-android'

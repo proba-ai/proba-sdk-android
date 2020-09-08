@@ -33,14 +33,13 @@ android {
 }
 
 repositories {
-    mavenLocal()
     jcenter()
     mavenCentral()
 }
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
-    implementation "com.appbooster.appboostersdk:appboostersdk-debug:$version"
+    implementation "com.appbooster.appboostersdk:appboostersdk:$version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.3.1'
     implementation 'androidx.appcompat:appcompat:1.2.0'
