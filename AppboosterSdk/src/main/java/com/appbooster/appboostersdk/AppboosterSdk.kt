@@ -77,7 +77,8 @@ public class AppboosterSdk private constructor(
         }
     }
 
-    /** Returns list of {@link Experiment} applied to current device
+    /**
+     * Returns list of [Experiment] applied to current device
      */
     val experiments: List<Experiment>
         get() {
@@ -108,11 +109,11 @@ public class AppboosterSdk private constructor(
     }
 
     /**
-     * Returns value of experiment specified by the given key as {@link String}
+     * Returns value of experiment specified by the given key as [String]
      *
      * @param key: Experiment key
      *
-     * @returns {@link String} representing the value of the experiment.
+     * @returns [String] representing the value of the experiment.
      * */
     @JvmName("getValue")
     operator fun get(key: String): String? = value(key)
@@ -125,7 +126,7 @@ public class AppboosterSdk private constructor(
     }
 
 
-    /** Builder for a {@link AppboosterSdk}. */
+    /** Builder for a [AppboosterSdk]. */
     public class Builder(private val context: Context) {
         private var sdkToken: String? = null
         private var appId: String? = null
@@ -159,7 +160,7 @@ public class AppboosterSdk private constructor(
         fun deviceId(deviceId: String) = apply { this.deviceId = deviceId }
 
         /**
-         * Turns the shake motion to show ${@link AppboosterDebugActivity} on or off.
+         * Turns the shake motion to show [AppboosterDebugActivity] on or off.
          *
          * @param enable Should be <code>true</code> to enable, or <code>false</code> to disable this
          *     setting. <code>true</code> by default.
@@ -192,7 +193,9 @@ public class AppboosterSdk private constructor(
         fun defaults(defaults: Map<String, String>) = apply { this.defaults = defaults }
 
         /**
-         * Returns a {@link AppboosterSdk}.
+         * Returns a [AppboosterSdk] instance.
+         *
+         * @throws AppboosterSetupException
          */
         fun build(): AppboosterSdk {
             if (sdkToken.isNullOrEmpty()) {

@@ -2,10 +2,8 @@ package com.appbooster.example
 
 import android.graphics.Color
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.appbooster.appboostersdk.AppboosterSdk
-import com.google.android.material.button.MaterialButton
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
