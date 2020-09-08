@@ -1,6 +1,7 @@
 package com.appbooster.appboostersdk
 
 import android.os.SystemClock
+import android.util.Log
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
@@ -111,6 +112,7 @@ internal class Client(
         onSuccessListener: AppboosterSdk.OnSuccessListener,
         onErrorListener: AppboosterSdk.OnErrorListener
     ) {
+        Log.w("AppboosterSdk", "Debug mode is enabled. Don't forget to disable it after release: https://platform.appbooster.com/install_sdk")
         val request = requestBuilder.request(
             makeQueryString(defaultKeys),
             Api.EXPERIMENTS_PATH,

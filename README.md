@@ -146,12 +146,12 @@ To show the debug activity you just need to turn it on in your personal cabinet 
 
 Kotlin:
 ```
-AppboosterDebugActivity.launch(context: Context)
+sdk.launchDebugMode(context: Context) // you can use either application or activity context
 ```
 
 Java:
 ```
-AppboosterDebugActivity.launch(Context context); // you can use either application or activity context
+sdk.launchDebugMode(Context context); // you can use either application or activity context
 ```
 
 By default debug activity will be shown by performing shake motion on your device.

@@ -146,7 +146,7 @@ class AppboosterDebugActivity : AppCompatActivity() {
 
     companion object {
         @JvmStatic
-        fun launch(context: Context) {
+        internal fun launch(context: Context) {
             val intent = Intent(context, AppboosterDebugActivity::class.java)
                 .apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
             context.startActivity(intent)
