@@ -111,11 +111,31 @@ In case of problems with no internet connection or another, the values obtained 
 Kotlin:
 ```
 val experiments = sdk.experiments
+
+
+// i.e. set Amplitude user properties
+JSONObject jsonObject = new JSONObject()
+
+for (Experiment e : experiments) {
+  jsonObject.put(e.key, e.value)
+}
+
+Amplitude.getInstance().setUserProperties(jsonObject)
 ```
 
 Java:
 ```
 List<Experiment> experiments = sdk.getExperiments();
+
+// i.e. set Amplitude user properties
+JSONObject jsonObject = new JSONObject();
+
+for (Experiment e : experiments) {
+  jsonObject.put(e.key, e.value);
+}
+
+Amplitude.getInstance().setUserProperties(jsonObject);
+
 ```
 
 ### How to debug?
