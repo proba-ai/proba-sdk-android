@@ -111,31 +111,41 @@ In case of problems with no internet connection or another, the values obtained 
 Kotlin:
 ```
 val experiments = sdk.experiments
-
-
-// i.e. set Amplitude user properties
-JSONObject jsonObject = new JSONObject()
-
-for (Experiment e : experiments) {
-  jsonObject.put(e.key, e.value)
-}
-
-Amplitude.getInstance().setUserProperties(jsonObject)
 ```
 
 Java:
 ```
-List<Experiment> experiments = sdk.getExperiments();
+Map<String, String> experiments = sdk.getExperiments();
+```
 
-// i.e. set Amplitude user properties
-JSONObject jsonObject = new JSONObject();
+Appsflyer users can integrate Appbooster sdk with analytics as shown below:
 
-for (Experiment e : experiments) {
-  jsonObject.put(e.key, e.value);
-}
+Kotlin:
+```
+val experiments = sdk.experiments
+AppsFlyerLib.getInstance().setAdditionalData(experiments)
+```
 
-Amplitude.getInstance().setUserProperties(jsonObject);
+Java:
+```
+Map<String, String> experiments = sdk.getExperiments();
+AppsFlyerLib.getInstance().setAdditionalData(experiments);
+```
 
+Amplitude users can integrate Appbooster sdk with analytics as shown below:
+
+Kotlin:
+```
+val experiments = sdk.experiments
+val userProperties = JSONObject(experiments)
+Amplitude.getInstance().setUserProperties(userProperties)
+```
+
+Java:
+```
+Map<String, String> experiments = sdk.getExperiments();
+JSONObject userProperties = new JSONObject(experiments);
+AppsFlyerLib.getInstance().setAdditionalData(userProperties);
 ```
 
 ### How to debug?

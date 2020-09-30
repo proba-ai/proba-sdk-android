@@ -6,7 +6,6 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.appbooster.appboostersdk.AppboosterDebugActivity;
 import com.appbooster.appboostersdk.AppboosterSdk;
 import com.google.android.material.button.MaterialButton;
 
