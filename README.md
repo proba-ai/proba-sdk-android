@@ -158,7 +158,7 @@ Kotlin:
 ```
 AppboosterSdk.Builder(context)
         //...
-        .isInDevMode(true) false by default, to print all debugging info in the console
+        .showLogs(true) false by default, to print all debugging info in the console
         //...
         
         
@@ -169,7 +169,7 @@ Java:
 ```
 AppboosterSdk.Builder(context)
         //...
-        .isInDevMode(true) false by default, to print all debugging info in the console
+        .showLogs(true) false by default, to print all debugging info in the console
         //...
         
 long duration = sdk.getLastOperationDurationMillis(); 
