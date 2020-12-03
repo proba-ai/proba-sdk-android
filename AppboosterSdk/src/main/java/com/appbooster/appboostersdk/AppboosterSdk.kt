@@ -45,12 +45,13 @@ public class AppboosterSdk private constructor(
     connectionTimeout: Long,
     showLogs: Boolean,
     private val defaults: Map<String, String>,
+    appsFlyerId: String?,
     private val store: Store
 ) {
 
     private var mLastShakeTime: Long = -1L
     private val client: Client =
-        Client(store, appId, deviceId, sdkToken, connectionTimeout, showLogs)
+        Client(store, appId, deviceId, sdkToken, appsFlyerId, connectionTimeout, showLogs)
     private val handler: AppboosterHandler = AppboosterHandler()
 
     init {
@@ -82,30 +83,47 @@ public class AppboosterSdk private constructor(
     }
 
     /**
-     * Returns list of [Experiment] applied to current device
-     *
-     * @param withPrefix to prepend `[Appbooster]` prefix to experiment keys returned. `true` by default.
+     * Returns map of [Experiment] key, [Experiment] value applied to current device
      */
     @JvmOverloads
-    public fun getExperiments(withPrefix: Boolean = true): Map<String, String> {
-        return HashMap<String, String>()
-            .apply {
-                if (store.isInDebugMode) {
-                    store.experimentsDefaults
-                        .map { experiment ->
-                            val debugExperiment =
-                                store.experimentsDebug.firstOrNull { debug -> experiment.key == debug.key }
-                            Experiment(experiment.key, debugExperiment?.value ?: experiment.value)
-                        }
-                } else {
-                    store.experimentsDefaults
-                }.forEach { experiment ->
-                    put(
-                        if (withPrefix) "[Appbooster] ${experiment.key}" else experiment.key,
-                        experiment.value
+    public fun getExperiments(): Map<String, String> {
+        return mapExperimentsOnDefaults()
+                    .map {
+                        it.key to it.value
+                    }.toMap()
+
+    }
+
+    /**
+     * Returns map of [Experiment]s applied to current device with fields details
+     */
+    @JvmOverloads
+    public fun getExperimentsWithDetails(): Map<String, String> {
+        return mapExperimentsOnDefaults()
+                    .flatMap {
+                        val valueKey = "[Appbooster] ${it.key}"
+                        val valueValue = it.value
+                        val optionKey = "[Appbooster] [internal] ${it.key}"
+                        val optionValue = it.optionId.toString()
+                        listOf(valueKey to valueValue, optionKey to optionValue)
+                    }.toMap()
+    }
+
+    private fun mapExperimentsOnDefaults(): List<Experiment> {
+        return if (store.isInDebugMode) {
+            store.experimentsDefaults
+                .map { experiment ->
+                    val debugExperiment =
+                        store.experimentsDebug.firstOrNull { debug -> experiment.key == debug.key }
+                    Experiment(
+                        experiment.key,
+                        debugExperiment?.value ?: experiment.value,
+                        experiment.optionId
                     )
                 }
-            }
+        } else {
+            store.experimentsDefaults
+        }
     }
 
     /**
@@ -169,6 +187,7 @@ public class AppboosterSdk private constructor(
         private var connectionTimeout: Long = 3000L
         private var showLogs: Boolean = false
         private var defaults: Map<String, String> = emptyMap()
+        private var appsFlyerId: String? = null
 
         private val store = Store.getInstance(context.applicationContext)
 
@@ -228,6 +247,14 @@ public class AppboosterSdk private constructor(
         fun defaults(@NotNull defaults: Map<String, String>) = apply { this.defaults = defaults }
 
         /**
+         * Place here Appsflyer Id if you use it
+         *
+         *
+         * */
+        fun appsFlyerId(id: String) = apply { this.appsFlyerId = id }
+
+
+        /**
          * Returns a [AppboosterSdk] instance.
          *
          * @throws AppboosterSetupException
@@ -264,6 +291,7 @@ public class AppboosterSdk private constructor(
                 connectionTimeout,
                 showLogs,
                 defaults,
+                appsFlyerId,
                 store
             )
         }

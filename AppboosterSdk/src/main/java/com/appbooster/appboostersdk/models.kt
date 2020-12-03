@@ -29,7 +29,8 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class Experiment (
     var key: String = "",
-    var value: String = ""
+    var value: String = "",
+    var optionId: Long = 0
 )
 
 @JsonClass(generateAdapter = true)
