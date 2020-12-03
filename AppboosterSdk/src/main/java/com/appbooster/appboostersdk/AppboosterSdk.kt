@@ -94,7 +94,7 @@ public class AppboosterSdk private constructor(
                     store.experimentsDefaults
                         .map { experiment ->
                             val debugExperiment =
-                                store.experimentsDebug.firstOrNull { debug -> experiment.key == debug.value }
+                                store.experimentsDebug.firstOrNull { debug -> experiment.key == debug.key }
                             Experiment(experiment.key, debugExperiment?.value ?: experiment.value)
                         }
                 } else {
