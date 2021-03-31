@@ -17,6 +17,8 @@ class MainActivity : AppCompatActivity() {
         val sdk = AppboosterSdk.Builder(this)
             .appId("11314")
             .sdkToken("94EBA72B439D4A18B971231088C77D5F")
+            .appsFlyerId("APPSFLYER_ID")
+            .amplitudeUserId("AMPLITUDE_USER_ID")
             .defaults(
                 mapOf(
                     "buttonColor" to "blue"
