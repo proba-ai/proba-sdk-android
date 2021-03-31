@@ -46,12 +46,13 @@ public class AppboosterSdk private constructor(
     showLogs: Boolean,
     private val defaults: Map<String, String>,
     appsFlyerId: String?,
+    amplitudeId: String?,
     private val store: Store
 ) {
 
     private var mLastShakeTime: Long = -1L
     private val client: Client =
-        Client(store, appId, deviceId, sdkToken, appsFlyerId, connectionTimeout, showLogs)
+        Client(store, appId, deviceId, sdkToken, appsFlyerId, amplitudeId, connectionTimeout, showLogs)
     private val handler: AppboosterHandler = AppboosterHandler()
 
     init {
@@ -188,6 +189,7 @@ public class AppboosterSdk private constructor(
         private var showLogs: Boolean = false
         private var defaults: Map<String, String> = emptyMap()
         private var appsFlyerId: String? = null
+        private var amplitudeId: String? = null
 
         private val store = Store.getInstance(context.applicationContext)
 
@@ -253,6 +255,13 @@ public class AppboosterSdk private constructor(
          * */
         fun appsFlyerId(id: String) = apply { this.appsFlyerId = id }
 
+        /**
+         * Place here Amplitude User Id if you use it
+         *
+         *
+         * */
+        fun amplitudeUserId(id: String) = apply { this.amplitudeId = id }
+
 
         /**
          * Returns a [AppboosterSdk] instance.
@@ -292,6 +301,7 @@ public class AppboosterSdk private constructor(
                 showLogs,
                 defaults,
                 appsFlyerId,
+                amplitudeId,
                 store
             )
         }

@@ -1,0 +1,117 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+apply plugin: "org.jetbrains.dokka"
+
+dokka {
+    outputFormat = 'markdown'
+    outputDirectory = "$buildDir/javadoc"
+
+    configuration {
+        sourceLink {
+            path = "src/main/java"
+            url = "https://github.com/appbooster/appbooster-sdk-android/tree/master/AppboosterSdk/src/main/java/"
+            lineSuffix = "#L"
+        }
+    }
+}
+
+task androidJavadocsJar(type: Jar, dependsOn: dokka) {
+    archiveClassifier.set('javadoc')
+    from dokka.outputDirectory
+}
+
+task androidSourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    archiveClassifier.set('sources')
+}
+
+artifacts {
+    archives androidSourcesJar
+    archives androidJavadocsJar
+}
+
+ext["signing.keyId"] = ''
+ext["signing.password"] = ''
+ext["signing.secretKeyRingFile"] = ''
+ext["ossrhUsername"] = ''
+ext["ossrhPassword"] = ''
+ext["sonatypeStagingProfileId"] = ''
+
+File secretPropsFile = project.rootProject.file('local.properties')
+if (secretPropsFile.exists()) {
+    Properties p = new Properties()
+    p.load(new FileInputStream(secretPropsFile))
+    p.each { name, value ->
+        ext[name] = value
+    }
+} else {
+    ext["signing.keyId"] = System.getenv('SIGNING_KEY_ID')
+    ext["signing.password"] = System.getenv('SIGNING_PASSWORD')
+    ext["signing.secretKeyRingFile"] = System.getenv('SIGNING_SECRET_KEY_RING_FILE')
+    ext["ossrhUsername"] = System.getenv('OSSRH_USERNAME')
+    ext["ossrhPassword"] = System.getenv('OSSRH_PASSWORD')
+    ext["sonatypeStagingProfileId"] = System.getenv('SONATYPE_STAGING_PROFILE_ID')
+}
+afterEvaluate{
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId group
+                artifactId 'appboostersdk'
+                version version
+
+                artifact androidJavadocsJar
+                artifact androidSourcesJar
+
+                pom {
+                    name = 'Appbooster Android SDK'
+                    description = 'Appbooster mobile SDK for Android platform'
+                    url = 'https://github.com/appbooster/appbooster-sdk-android'
+                    inceptionYear = '2020'
+                    licenses {
+                        license {
+                            name = 'MIT License (MIT)'
+                            url = 'https://github.com/appbooster/appbooster-sdk-android/blob/master/LICENSE'
+                        }
+                    }
+                    developers {
+                        developer {
+                            name = 'Appbooster Team'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:https://github.com/appbooster/appbooster-sdk-android.git'
+                        url = 'https://github.com/appbooster/appbooster-sdk-android'
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                name = "sonatype"
+
+                def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+                credentials {
+                    username ossrhUsername
+                    password ossrhPassword
+                }
+            }
+        }
+    }
+}
+
+
+//nexusStaging {
+//    packageGroup = 'com.appbooster.appboostersdk'
+//    stagingProfileId = sonatypeStagingProfileId
+//    username = ossrhUsername
+//    password = ossrhPassword
+//}
+
+signing {
+    sign publishing.publications
+}
