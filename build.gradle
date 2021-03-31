@@ -30,10 +30,7 @@ ext {
     minSdkVersion = 14
     targetSdkVersion = 30
 
-    appboosterSdkVersion = "0.3.1-SNAPSHOT"
-
-    mavenRepoUrl = (project.hasProperty('mavenRepoUrl')
-            ? project.property('mavenRepoUrl') : '/tmp/appboosterRepo/')
+    appboosterSdkVersion = "0.3.1"
 }
 
 subprojects {
