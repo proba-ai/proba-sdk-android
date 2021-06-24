@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ai.proba.probasdk">
+
+    <application>
+        <activity
+            android:name="ai.proba.probasdk.ProbaDebugActivity"
+            android:theme="@style/Theme.Proba.DebugScreen"
+            android:configChanges="orientation|screenSize"
+            android:launchMode="singleTask" />
+    </application>
+</manifest>
