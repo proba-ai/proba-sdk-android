@@ -47,12 +47,13 @@ public class AppboosterSdk private constructor(
     private val defaults: Map<String, String>,
     appsFlyerId: String?,
     amplitudeId: String?,
+    deviceProperties: Map<String, String>?,
     private val store: Store
 ) {
 
     private var mLastShakeTime: Long = -1L
     private val client: Client =
-        Client(store, appId, deviceId, sdkToken, appsFlyerId, amplitudeId, connectionTimeout, showLogs)
+        Client(store, appId, deviceId, sdkToken, appsFlyerId, amplitudeId, deviceProperties, connectionTimeout, showLogs)
     private val handler: AppboosterHandler = AppboosterHandler()
 
     init {
@@ -190,6 +191,7 @@ public class AppboosterSdk private constructor(
         private var defaults: Map<String, String> = emptyMap()
         private var appsFlyerId: String? = null
         private var amplitudeId: String? = null
+        private var deviceProperties: Map<String, String>? = null
 
         private val store = Store.getInstance(context.applicationContext)
 
@@ -262,6 +264,13 @@ public class AppboosterSdk private constructor(
          * */
         fun amplitudeUserId(id: String) = apply { this.amplitudeId = id }
 
+        /**
+         * Place here additional information about device you want to track
+         *
+         *
+         */
+        fun deviceProperties(properties: Map<String, String>) = apply {this.deviceProperties = properties}
+
 
         /**
          * Returns a [AppboosterSdk] instance.
@@ -302,6 +311,7 @@ public class AppboosterSdk private constructor(
                 defaults,
                 appsFlyerId,
                 amplitudeId,
+                deviceProperties,
                 store
             )
         }

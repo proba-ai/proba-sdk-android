@@ -43,6 +43,7 @@ internal class Client(
     token: String,
     appsFlyerId: String?,
     amplitudeId: String?,
+    deviceProperties: Map<String, String>?,
     connectionTimeout: Long,
     isInDevMode: Boolean
 ) {
@@ -61,7 +62,7 @@ internal class Client(
             }
         )
         .build()
-    private val requestBuilder = RequestBuilder(appId, deviceId, token, appsFlyerId, amplitudeId)
+    private val requestBuilder = RequestBuilder(appId, deviceId, token, appsFlyerId, amplitudeId, deviceProperties)
     private val jsonAdapters = JsonAdapters
 
     internal var lastOperationDurationMillis: Long = -1
@@ -184,7 +185,8 @@ internal class RequestBuilder(
     private val deviceId: String,
     private val token: String,
     private val appsFlyerId: String?,
-    private val amplitudeId: String?
+    private val amplitudeId: String?,
+    private val deviceProperties: Map<String, String>?
 ) {
     internal fun request(query: String, vararg paths: String) = Request.Builder()
         .addHeader(contentTypeHeader.first, contentTypeHeader.second)
@@ -208,7 +210,10 @@ internal class RequestBuilder(
                 claims.put("appsFlyerId", it)
             }
             amplitudeId?.let{
-                claims.put("amplitudeId", it);
+                claims.put("amplitudeId", it)
+            }
+            deviceProperties?.let{
+                claims.put("deviceProperties", it)
             }
 
             return Jwts.builder()
