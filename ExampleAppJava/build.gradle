@@ -4,7 +4,7 @@ android {
     compileSdkVersion 29
 
     defaultConfig {
-        applicationId "com.appbooster.exampleappjava"
+        applicationId "ai.proba.exampleappjava"
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 1
@@ -22,12 +22,13 @@ android {
 }
 
 repositories {
-    mavenCentral()
+//    mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "com.appbooster.appboostersdk:appboostersdk:$version"
+    implementation "ai.proba.probasdk:probasdk:$version"
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation 'com.google.android.material:material:1.2.1'

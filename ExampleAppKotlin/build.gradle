@@ -7,7 +7,7 @@ android {
     compileSdkVersion 29
 
     defaultConfig {
-        applicationId "com.appbooster.example"
+        applicationId "ai.proba.example"
         minSdkVersion 14
         targetSdkVersion 29
         versionCode 3
@@ -33,12 +33,13 @@ android {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
-    implementation "com.appbooster.appboostersdk:appboostersdk:$version"
+    implementation "ai.proba.probasdk:probasdk:$version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.3.1'
     implementation 'androidx.appcompat:appcompat:1.2.0'

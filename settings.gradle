@@ -1,4 +1,4 @@
-include ':AppboosterSdk'
+include ':ProbaSdk'
 include ':ExampleAppKotlin'
 include ':ExampleAppJava'
-rootProject.name = "Appbooster SDK with Example Apps"
+rootProject.name = "Proba SDK with Example Apps"
