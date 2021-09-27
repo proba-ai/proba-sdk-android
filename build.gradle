@@ -30,12 +30,12 @@ ext {
     minSdkVersion = 14
     targetSdkVersion = 30
 
-    appboosterSdkVersion = "0.4.0"
+    probaSdkVersion = "0.1.0"
 }
 
 subprojects {
-    version = rootProject.ext.appboosterSdkVersion
-    group = 'com.appbooster.appboostersdk'
+    version = rootProject.ext.probaSdkVersion
+    group = 'com.proba.probasdk'
 
     project.plugins.whenPluginAdded { plugin ->
         def isAndroidLibrary = "com.android.build.gradle.LibraryPlugin".equals(plugin.class.name)
