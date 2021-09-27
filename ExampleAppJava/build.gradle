@@ -28,7 +28,7 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "com.proba.probasdk:probasdk:$version"
+    implementation "ai.proba.probasdk:probasdk:$version"
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation 'com.google.android.material:material:1.2.1'

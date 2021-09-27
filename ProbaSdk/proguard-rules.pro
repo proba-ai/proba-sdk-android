@@ -30,5 +30,5 @@
 #-dontwarn org.bouncycastle.**
 #
 #-keep class com.proba.probasdk.** { *; }
-#-keepnames class com.proba.probasdk.** { *; }
-#-keepnames interface com.proba.probasdk.** { *; }
+#-keepnames class ai.proba.probasdk.** { *; }
+#-keepnames interface ai.proba.probasdk.** { *; }

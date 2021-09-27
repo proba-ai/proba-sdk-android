@@ -8,5 +8,5 @@
 -keepnames class org.bouncycastle.** { *; }
 -dontwarn org.bouncycastle.**
 
--keep class com.proba.probasdk.** { *; }
--keepnames class com.proba.probasdk.** { *; }
+-keep class ai.proba.probasdk.** { *; }
+-keepnames class ai.proba.probasdk.** { *; }

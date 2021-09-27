@@ -1,4 +1,4 @@
-![Maven-central](https://img.shields.io/maven-central/v/com.proba.probasdk/probasdk?color=dark%20green&style=flat-square)
+![Maven-central](https://img.shields.io/maven-central/v/ai.proba.probasdk/probasdk?color=dark%20green&style=flat-square)
 
 # proba-sdk-android
 
@@ -21,7 +21,7 @@ Mobile framework for Proba platform.
 ```
     dependencies {
         // ...
-        implementation "com.proba.probasdk:probasdk:${probasdk_version}"
+        implementation "ai.proba.probasdk:probasdk:${probasdk_version}"
         // ...
     }
 ```
