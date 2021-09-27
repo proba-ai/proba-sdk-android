@@ -79,13 +79,13 @@ internal class Store private constructor(private val prefs: SharedPreferences) {
 
     companion object {
 
-        private val SHARED_PREFERENCES_KEY = "com.proba.storage"
-        private val SHARED_PREFERENCES_DEVICE_ID_KEY = "com.proba.storage.deviceId"
+        private val SHARED_PREFERENCES_KEY = "ai.proba.storage"
+        private val SHARED_PREFERENCES_DEVICE_ID_KEY = "ai.proba.storage.deviceId"
 
-        private val SHARED_PREFERENCES_EXPERIMENTS_KEY = "com.proba.storage.experiments"
-        private val SHARED_PREFERENCES_EXPERIMENTS_DEFAULTS_KEY = "com.proba.storage.experiments.defaults"
-        private val SHARED_PREFERENCES_EXPERIMENTS_DEBUG_DEFAULTS_KEY = "com.proba.storage.experiments.debug.defaults"
-        private val SHARED_PREFERENCES_EXPERIMENTS_DEBUG_MODE_KEY = "com.proba.storage.experiments.debug.mode"
+        private val SHARED_PREFERENCES_EXPERIMENTS_KEY = "ai.proba.storage.experiments"
+        private val SHARED_PREFERENCES_EXPERIMENTS_DEFAULTS_KEY = "ai.proba.storage.experiments.defaults"
+        private val SHARED_PREFERENCES_EXPERIMENTS_DEBUG_DEFAULTS_KEY = "ai.proba.storage.experiments.debug.defaults"
+        private val SHARED_PREFERENCES_EXPERIMENTS_DEBUG_MODE_KEY = "ai.proba.storage.experiments.debug.mode"
 
         internal fun getInstance(context: Context): Store {
             val prefs = context.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE)
