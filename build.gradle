@@ -30,7 +30,7 @@ ext {
     minSdkVersion = 14
     targetSdkVersion = 30
 
-    probaSdkVersion = "0.1.0.2"
+    probaSdkVersion = "0.1.0"
 }
 
 subprojects {
