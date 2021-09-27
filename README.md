@@ -21,7 +21,7 @@ Mobile framework for Proba platform.
 ```
     dependencies {
         // ...
-        implementation "com.proba.probasdk:probasdk:${appbostersdk_version}"
+        implementation "com.proba.probasdk:probasdk:${probasdk_version}"
         // ...
     }
 ```
