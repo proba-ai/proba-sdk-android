@@ -7,7 +7,7 @@ Mobile framework for Proba platform.
 ## Installation
 
 1. On project level `build.gradle` add `mavenCentral` repository to all projects section
-```
+```javascript
     allprojects {
         // ...
         repositories {
@@ -18,7 +18,7 @@ Mobile framework for Proba platform.
 ```
 
 2. Add the library to `app` level `build.gradle` dependencies section
-```
+```javascript
     dependencies {
         // ...
         implementation "ai.proba.probasdk:probasdk:${probasdk_version}"
@@ -32,7 +32,7 @@ Mobile framework for Proba platform.
 ### Initialization:
 
 Kotlin:
-```
+```kotlin
 val sdk = ProbaSdk.Builder(context) // you can initiate sdk using either application or activity context
             .appId("${YOUR_APP_ID}")
             .sdkToken("${YOUR_SDK_TOKEN}")
@@ -55,7 +55,7 @@ val sdk = ProbaSdk.Builder(context) // you can initiate sdk using either applica
 ```
 
 Java:
-```
+```java
 Map<String, String> defaults = new HashMap<>();
 defaults.put("${TEST_1_KEY}", "${TEST_1_DEFAULT_VALUE}");
 defaults.put("${TEST_2_KEY}", "${TEST_2_DEFAULT_VALUE}");
@@ -78,7 +78,7 @@ ProbaSdk sdk = new ProbaSdk.Builder(this)
 ### How to fetch known test values that associated with your device?
 
 Kotlin:
-```
+```kotlin
 sdk.fetch(onSuccessListener = object: ProbaSdk.OnSuccessListener{
             override fun onSuccess() {
             }
@@ -90,7 +90,7 @@ sdk.fetch(onSuccessListener = object: ProbaSdk.OnSuccessListener{
 ```
 
 Java:
-```
+```java
 sdk.fetch(new ProbaSdk.OnSuccessListener() {
               @Override
               public void onSuccess() {
@@ -108,12 +108,12 @@ sdk.fetch(new ProbaSdk.OnSuccessListener() {
 ### How to get the value for a specific test?
 
 Kotlin:
-```
+```kotlin
 val value = sdk["${TEST_KEY}"]
 ```
 
 Java:
-```
+```java
 String value = sdk.getValue("${TEST_KEY}");
 ```
 
@@ -122,7 +122,7 @@ In case of problems with no internet connection or another, the values obtained 
 ### How to get user tests for analytics?
 
 Kotlin:
-```
+```kotlin
 val experiments = sdk.experiments
 
 // or if you need additional details for experiments
@@ -131,7 +131,7 @@ val experimentsWithDetails = sdk.experimentsWithDetails
 ```
 
 Java:
-```
+```java
 Map<String, String> experiments = sdk.getExperiments();
 
 // or if you need additional details for experiments
@@ -141,7 +141,7 @@ Map<String, String> experiments = sdk.getExperimentsWithDetails();
 Appsflyer users can integrate Proba sdk with analytics as shown below:
 
 Kotlin:
-```
+```kotlin
 val experiments = sdk.experiments
 
 // or if you need additional details for experiments
@@ -151,7 +151,7 @@ AppsFlyerLib.getInstance().setAdditionalData(experiments)
 ```
 
 Java:
-```
+```java
 Map<String, String> experiments = sdk.getExperiments();
 
 // or if you need additional details for experiments
@@ -163,7 +163,7 @@ AppsFlyerLib.getInstance().setAdditionalData(experiments);
 Amplitude users can integrate Proba sdk with analytics as shown below:
 
 Kotlin:
-```
+```kotlin
 val experiments = sdk.experiments
 
 // or if you need additional details for experiments
@@ -174,7 +174,7 @@ Amplitude.getInstance().setUserProperties(userProperties)
 ```
 
 Java:
-```
+```java
 Map<String, String> experiments = sdk.getExperiments();
 
 // or if you need additional details for experiments
@@ -191,7 +191,7 @@ Before debug make sure that debug-mode for your App is turned-on on [settings pa
   ![](https://imgproxy.proba.com/9ACImnEbmsO822dynjTjcC_B8aXzbbpPQsOgop2PlBs//aHR0cHM6Ly9hcHBib29zdGVyLWNsb3VkLnMzLmV1LWNlbnRyYWwtMS5hbWF6b25hd3MuY29tLzk0N2M5NzdmLTAwY2EtNDA1Yi04OGQ4LTAzOTM4ZjY4OTAzYi5wbmc.png)
 
 Kotlin:
-```
+```kotlin
 ProbaSdk.Builder(context)
         //...
         .showLogs(true) false by default, to print all debugging info in the console
@@ -202,7 +202,7 @@ val duration = sdk.lastOperationDurationMillis // the duration of the last opera
 ```
 
 Java:
-```
+```java
 ProbaSdk.Builder(context)
         //...
         .showLogs(true) false by default, to print all debugging info in the console
@@ -215,12 +215,12 @@ In debug mode you can see all actual tests and check how the user will see each 
 To show the debug activity you just need to turn it on in your personal cabinet and call
 
 Kotlin:
-```
+```kotlin
 sdk.launchDebugMode(context: Context) // you can use either application or activity context
 ```
 
 Java:
-```
+```java
 sdk.launchDebugMode(Context context); // you can use either application or activity context
 ```
 
