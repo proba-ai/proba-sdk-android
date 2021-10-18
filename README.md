@@ -186,9 +186,9 @@ AppsFlyerLib.getInstance().setAdditionalData(userProperties);
 
 ### How to debug?
 
-Before debug make sure that debug-mode for your App is turned-on on [settings page](https://platform.proba.com/ab/settings)
+Before debug make sure that debug-mode for your App is turned-on on [settings page](https://app.proba.ai/ab/settings)
 
-  ![](https://imgproxy.proba.com/9ACImnEbmsO822dynjTjcC_B8aXzbbpPQsOgop2PlBs//aHR0cHM6Ly9hcHBib29zdGVyLWNsb3VkLnMzLmV1LWNlbnRyYWwtMS5hbWF6b25hd3MuY29tLzk0N2M5NzdmLTAwY2EtNDA1Yi04OGQ4LTAzOTM4ZjY4OTAzYi5wbmc.png)
+  ![](https://imgproxy.proba.ai/9ACImnEbmsO822dynjTjcC_B8aXzbbpPQsOgop2PlBs//aHR0cHM6Ly9hcHBib29zdGVyLWNsb3VkLnMzLmV1LWNlbnRyYWwtMS5hbWF6b25hd3MuY29tLzk0N2M5NzdmLTAwY2EtNDA1Yi04OGQ4LTAzOTM4ZjY4OTAzYi5wbmc.png)
 
 Kotlin:
 ```
