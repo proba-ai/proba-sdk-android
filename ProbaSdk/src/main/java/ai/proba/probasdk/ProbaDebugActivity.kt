@@ -34,6 +34,7 @@ class ProbaDebugActivity : AppCompatActivity() {
             finish()
         }
         findViewById<Button>(R.id.probaResetButton).setOnClickListener {
+            mExperimentsDebugDefaults.clear()
             store.experimentsDebug = emptyList()
             container.removeAllViews()
             store.experiments
@@ -55,7 +56,6 @@ class ProbaDebugActivity : AppCompatActivity() {
     }
 
     private fun mapExperimentOnViews(experiment: CompositeExperiment): View {
-
         val experimentContainer = inflater.inflate(R.layout.proba_experiment_item, findViewById(R.id.probaDebugContainer), false)
         experimentContainer.findViewById<TextView>(R.id.probaExperimentTitle).apply {
             text = experiment.name
