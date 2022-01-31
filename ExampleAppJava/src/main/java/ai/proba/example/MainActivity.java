@@ -1,4 +1,4 @@
-package ai.proba.exampleappjava;
+package ai.proba.example;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -6,16 +6,17 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import ai.proba.exampleappjava.R;
+import ai.proba.example.R;
 import ai.proba.probasdk.ProbaSdk;
 import com.google.android.material.button.MaterialButton;
-
-import com.google.android.material.button.MaterialButton;
+import com.my.tracker.MyTracker;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String MY_TRACKER_ID = "16733057808593240177";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,10 +26,12 @@ public class MainActivity extends AppCompatActivity {
         Map<String, String> defaults = new HashMap<>();
         defaults.put("buttonColor", "blue");
 
+        MyTracker.initTracker(MY_TRACKER_ID, getApplication());
 
         final ProbaSdk sdk = new ProbaSdk.Builder(this)
-                .appId("11314")
-                .sdkToken("94EBA72B439D4A18B971231088C77D5F")
+                .appId("25732")
+                .sdkToken("430BBA69FBBC434AA6C1529F1E160EAD")
+                .myTrackerId(MY_TRACKER_ID)
                 .defaults(defaults)
                 .build();
 
@@ -37,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                sdk.launchDebugMode(MainActivity.this);
+                                MyTracker.trackEvent("on button click event <java>");
+                                MyTracker.flush();
                             }
                         });
 

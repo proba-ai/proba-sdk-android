@@ -47,13 +47,14 @@ public class ProbaSdk private constructor(
     private val defaults: Map<String, String>,
     appsFlyerId: String?,
     amplitudeId: String?,
+    myTrackerId: String?,
     deviceProperties: Map<String, String>?,
     private val store: Store
 ) {
 
     private var mLastShakeTime: Long = -1L
     private val client: Client =
-        Client(store, appId, deviceId, sdkToken, appsFlyerId, amplitudeId, deviceProperties, connectionTimeout, showLogs)
+        Client(store, appId, deviceId, sdkToken, appsFlyerId, amplitudeId, myTrackerId, deviceProperties, connectionTimeout, showLogs)
     private val handler: ProbaHandler = ProbaHandler()
 
     init {
@@ -192,6 +193,7 @@ public class ProbaSdk private constructor(
         private var defaults: Map<String, String> = emptyMap()
         private var appsFlyerId: String? = null
         private var amplitudeId: String? = null
+        private var myTrackerId: String? = null
         private var deviceProperties: Map<String, String>? = null
 
         private val store = Store.getInstance(context.applicationContext)
@@ -266,6 +268,13 @@ public class ProbaSdk private constructor(
         fun amplitudeUserId(id: String) = apply { this.amplitudeId = id }
 
         /**
+         * Place here My Tracker Id if you use it
+         *
+         *
+         * */
+        fun myTrackerId(id: String) = apply { this.myTrackerId = id }
+
+        /**
          * Place here additional information about device you want to track
          *
          *
@@ -312,6 +321,7 @@ public class ProbaSdk private constructor(
                 defaults,
                 appsFlyerId,
                 amplitudeId,
+                myTrackerId,
                 deviceProperties,
                 store
             )
