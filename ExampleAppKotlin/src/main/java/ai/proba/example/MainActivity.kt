@@ -5,30 +5,38 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.my.tracker.MyTracker
 import kotlinx.android.synthetic.main.activity_main.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        MyTracker.initTracker(MY_TRACKER_ID, application)
+
         val sdk = ProbaSdk.Builder(this)
-            .appId("11314")
-            .sdkToken("94EBA72B439D4A18B971231088C77D5F")
+            .appId("25732")
+            .sdkToken("430BBA69FBBC434AA6C1529F1E160EAD")
             .appsFlyerId("APPSFLYER_ID")
             .amplitudeUserId("AMPLITUDE_USER_ID")
+            .myTrackerId(MY_TRACKER_ID)
             .defaults(
                 mapOf(
                     "buttonColor" to "blue"
                 )
             )
+            .showLogs(true)
             .deviceProperties(mapOf("installedAt" to calculateInstalledAt()))
             .build()
 
         probaExampleButton.setOnClickListener {
-            sdk.launchDebugMode(this)
+            MyTracker.trackEvent("on button click event <kotlin>")
+            MyTracker.flush()
+            //sdk.launchDebugMode(this)
         }
 
         if (sdk["buttonColor"] != null) {
@@ -54,5 +62,9 @@ class MainActivity : AppCompatActivity() {
         val firstInstallationString = formatter.format(Date(firstInstallationTimeInMillis))
         Log.d("MainActivity", "firstInstallationString: $firstInstallationString")
         return firstInstallationString
+    }
+
+    companion object {
+        private const val MY_TRACKER_ID = "16733057808593240177"
     }
 }

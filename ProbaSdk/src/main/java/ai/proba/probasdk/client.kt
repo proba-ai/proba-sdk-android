@@ -42,6 +42,7 @@ internal class Client(
     token: String,
     appsFlyerId: String?,
     amplitudeId: String?,
+    myTrackerId: String?,
     deviceProperties: Map<String, String>?,
     connectionTimeout: Long,
     isInDevMode: Boolean
@@ -61,8 +62,7 @@ internal class Client(
             }
         )
         .build()
-    private val requestBuilder = RequestBuilder(appId, deviceId, token, appsFlyerId, amplitudeId, deviceProperties)
-    private val jsonAdapters = JsonAdapters
+    private val requestBuilder = RequestBuilder(appId, deviceId, token, appsFlyerId, amplitudeId, myTrackerId, deviceProperties)
 
     internal var lastOperationDurationMillis: Long = -1
 
@@ -185,6 +185,7 @@ internal class RequestBuilder(
     private val token: String,
     private val appsFlyerId: String?,
     private val amplitudeId: String?,
+    private val myTrackerId: String?,
     private val deviceProperties: Map<String, String>?
 ) {
     internal fun request(query: String, vararg paths: String) = Request.Builder()
@@ -210,6 +211,9 @@ internal class RequestBuilder(
             }
             amplitudeId?.let{
                 claims.put("amplitudeId", it)
+            }
+            myTrackerId?.let{
+                claims.put("myTrackerId", it)
             }
             deviceProperties?.let{
                 claims.put("deviceProperties", it)
